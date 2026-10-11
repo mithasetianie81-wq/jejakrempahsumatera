@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menelusuri Jejak Rempah Nusantara - Offline Standalone</title>
+    <style>
+        :root {
+            --bg-dark: #12100E;
+            --bg-card: #1C1917;
+            --bg-card-alt: #262220;
+            --border-color: #44403C;
+            --border-amber: rgba(217, 119, 6, 0.4);
+            --amber-main: #D97706;
+            --amber-light: #F59E0B;
+            --amber-glow: rgba(245, 158, 11, 0.2);
+            --text-main: #E7E5E4;
+            --text-muted: #A8A29E;
+            --text-dark: #292524;
+            --serif-font: 'Cinzel', 'Georgia', 'Times New Roman', serif;
+            --sans-font: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--sans-font);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            line-height: 1.5;
+        }
+
+        .paper-texture {
+            background-color: #FAF6EF;
+            background-image: radial-gradient(#E5D5C0 0.75px, transparent 0.75px), radial-gradient(#E5D5C0 0.75px, #FAF6EF 0.75px);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+            color: var(--text-dark);
+            border-radius: 12px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--amber-main);
+            border-radius: 4px;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.15); }
+        }
+        .ping-glow {
+            animation: pulseGlow 2.5s infinite ease-in-out;
+        }
+
+        @keyframes floatAnim {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .floating-avatar {
+            animation: floatAnim 3s infinite ease-in-out;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: rgba(28, 25, 23, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-amber);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+        }
+
+        .header-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--amber-main), var(--amber-light));
+            padding: 2px;
+            box-shadow: 0 0 15px var(--amber-glow);
+        }
+
+        .brand-icon-inner {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--amber-light);
+        }
+
+        .brand-title {
+            font-family: var(--serif-font);
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--amber-light);
+            letter-spacing: 0.05em;
+        }
+
+        .brand-subtitle {
+            font-size: 0.75rem;
+            color: rgba(254, 243, 199, 0.7);
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #292524;
+            color: var(--amber-light);
+            border: 1px solid var(--border-amber);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-icon:hover {
+            background-color: #44403C;
+        }
+
+        nav {
+            background-color: #0c0a09;
+            border-top: 1px solid rgba(68, 64, 60, 0.5);
+            padding: 0.5rem 1rem;
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-tab:hover {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+        }
+
+        .nav-tab.active {
+            background-color: var(--amber-main);
+            color: #000;
+            font-weight: 700;
+        }
+
+        main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .hero-banner {
+            position: relative;
+            border-radius: 16px;
+            border: 1px solid var(--border-amber);
+            background: linear-gradient(135deg, #1c1917 0%, #292524 50%, #451a03 100%);
+            padding: 2rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem;
+        }
+
+        .grid-12 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .grid-12 {
+                grid-template-columns: repeat(12, 1fr);
+            }
+            .col-span-4 { grid-column: span 4; }
+            .col-span-8 { grid-column: span 8; }
+            .col-span-7 { grid-column: span 7; }
+            .col-span-5 { grid-column: span 5; }
+        }
+
+        .avatar-box {
+            width: 180px;
+            height: 180px;
+            border-radius: 16px;
+            background: linear-gradient(to bottom, var(--amber-main), #78350f);
+            padding: 4px;
+            margin: 0 auto;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .avatar-inner {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-dark);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: rgba(217, 119, 6, 0.2);
+            color: #fde68a;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid rgba(217, 119, 6, 0.3);
+            margin-top: 0.75rem;
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #34d399;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--amber-main), var(--amber-light));
+            color: #000;
+            font-weight: 700;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: transform 0.2s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #292524;
+            color: var(--amber-light);
+            font-weight: 700;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-amber);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #44403C;
+        }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: border-color 0.2s;
+        }
+        .card:hover {
+            border-color: var(--amber-main);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background-color: rgba(217, 119, 6, 0.1);
+            color: var(--amber-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .map-container {
+            background-color: rgba(28, 25, 23, 0.9);
+            border: 1px solid var(--border-amber);
+            border-radius: 16px;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .spice-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-amber);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .spice-img-box {
+            height: 160px;
+            background: linear-gradient(135deg, #451a03, #1c1917);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .spice-tag {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background-color: rgba(217, 119, 6, 0.2);
+            color: var(--amber-light);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(217, 119, 6, 0.3);
+        }
+
+        .chat-box {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            height: 520px;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 1.25rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: flex-col;
+            gap: 1rem;
+            background-color: rgba(12, 10, 9, 0.5);
+        }
+
+        .msg-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        .msg-row.user {
+            justify-content: flex-end;
+        }
+
+        .msg-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--amber-main);
+            color: #000;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .msg-bubble {
+            background-color: #292524;
+            border: 1px solid #44403c;
+            padding: 0.85rem 1.1rem;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            max-width: 85%;
+        }
+        .msg-row.user .msg-bubble {
+            background-color: var(--amber-main);
+            color: #000;
+            border-top-right-radius: 0;
+            font-weight: 500;
+        }
+        .msg-row.bimantara .msg-bubble {
+            border-top-left-radius: 0;
+        }
+
+        .quick-q-bar {
+            padding: 0.75rem;
+            background-color: var(--bg-dark);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .btn-chip {
+            background-color: #292524;
+            color: var(--text-main);
+            border: 1px solid #44403c;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-chip:hover {
+            background-color: var(--amber-main);
+            color: #000;
+        }
+
+        .chat-input-form {
+            padding: 1rem;
+            background-color: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .input-text {
+            flex-grow: 1;
+            background-color: #0c0a09;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            color: #fff;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .input-text:focus {
+            border-color: var(--amber-main);
+        }
+
+        /* Modal styling */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-container {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-amber);
+            border-radius: 20px;
+            max-width: 650px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+        .close-btn:hover { color: #fff; }
+
+        footer {
+            background-color: #0c0a09;
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Inline SVG helper sizes */
+        .svg-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .svg-icon-lg {
+            width: 36px;
+            height: 36px;
+            fill: currentColor;
+        }
+
+        .splash-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background-color: #0c0a09;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        .splash-overlay.hidden-splash {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .splash-card {
+            background: linear-gradient(145deg, #1c1917, #262220);
+            border: 2px solid var(--border-amber);
+            border-radius: 20px;
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 30px var(--amber-glow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .splash-img-container {
+            width: 100%;
+            max-height: 480px;
+            overflow: hidden;
+            position: relative;
+            background-color: #12100e;
+        }
+        .splash-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .progress-bar-bg {
+            width: 80%;
+            max-width: 400px;
+            height: 10px;
+            background-color: #292524;
+            border-radius: 9999px;
+            overflow: hidden;
+            border: 1px solid var(--border-amber);
+            margin: 0.75rem 0 0.25rem 0;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--amber-main), var(--amber-light));
+            transition: width 0.2s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SPLASH SCREEN OVERLAY -->
+    <div id="splashScreen" class="splash-overlay">
+        <div class="splash-card">
+            <div class="splash-img-container">
+                <svg viewBox="0 0 900 450" class="splash-img" style="width: 100%; height: auto; display: block; background: linear-gradient(180deg, #0f0c0a 0%, #26170d 60%, #170d06 100%);">
+                    <defs>
+                        <radialGradient id="goldGlow" cx="50%" cy="40%" r="50%">
+                            <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.35"/>
+                            <stop offset="100%" stop-color="#0f0c0a" stop-opacity="0"/>
+                        </radialGradient>
+                        <linearGradient id="seaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#2d1a0e"/>
+                            <stop offset="100%" stop-color="#0c0704"/>
+                        </linearGradient>
+                        <linearGradient id="goldGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#fbbf24"/>
+                            <stop offset="50%" stop-color="#d97706"/>
+                            <stop offset="100%" stop-color="#78350f"/>
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Background Soft Glow -->
+                    <rect width="900" height="450" fill="url(#goldGlow)"/>
+
+                    <!-- Map Compass Grid Lines -->
+                    <circle cx="450" cy="200" r="160" stroke="#d97706" stroke-width="1" stroke-dasharray="4,4" fill="none" opacity="0.25"/>
+                    <circle cx="450" cy="200" r="220" stroke="#f59e0b" stroke-width="1" stroke-dasharray="6,6" fill="none" opacity="0.15"/>
+                    <line x1="450" y1="20" x2="450" y2="380" stroke="#d97706" stroke-width="1" opacity="0.2" stroke-dasharray="2,4"/>
+                    <line x1="150" y1="200" x2="750" y2="200" stroke="#d97706" stroke-width="1" opacity="0.2" stroke-dasharray="2,4"/>
+
+                    <!-- Compass Rose -->
+                    <g transform="translate(450, 180) scale(0.85)" opacity="0.35">
+                        <polygon points="0,-120 15,-20 0,0 -15,-20" fill="#f59e0b"/>
+                        <polygon points="0,-120 -15,-20 0,0" fill="#b45309"/>
+                        <polygon points="0,120 15,20 0,0 -15,20" fill="#f59e0b"/>
+                        <polygon points="0,120 15,20 0,0" fill="#b45309"/>
+                        <polygon points="120,0 20,15 0,0 20,-15" fill="#f59e0b"/>
+                        <polygon points="120,0 20,-15 0,0" fill="#b45309"/>
+                        <polygon points="-120,0 -20,15 0,0 -20,-15" fill="#f59e0b"/>
+                        <polygon points="-120,0 -20,15 0,0" fill="#b45309"/>
+                    </g>
+
+                    <!-- Waves -->
+                    <path d="M 0,330 Q 225,300 450,330 T 900,330 L 900,450 L 0,450 Z" fill="url(#seaGrad)" opacity="0.9"/>
+                    <path d="M 0,350 Q 225,320 450,350 T 900,350 L 900,450 L 0,450 Z" fill="#1c0f08" opacity="0.7"/>
+                    <path d="M 0,340 C 150,320 300,360 450,340 C 600,320 750,360 900,340" stroke="#f59e0b" stroke-width="2" fill="none" opacity="0.4"/>
+
+                    <!-- Ancient Nusantara Ship -->
+                    <g transform="translate(370, 140) scale(1.15)">
+                        <path d="M 10,130 C 40,165 110,165 150,130 C 130,140 30,140 10,130 Z" fill="url(#goldGold)"/>
+                        <path d="M 0,115 C 30,160 120,160 160,110 C 130,145 25,145 0,115 Z" fill="#f59e0b"/>
+                        <line x1="45" y1="125" x2="45" y2="45" stroke="#fbbf24" stroke-width="3"/>
+                        <line x1="100" y1="120" x2="100" y2="30" stroke="#fbbf24" stroke-width="3.5"/>
+                        <path d="M 45,50 L 80,60 L 75,105 L 45,95 Z" fill="#fef08a" opacity="0.85" stroke="#d97706" stroke-width="1.5"/>
+                        <path d="M 100,35 L 142,48 L 135,100 L 100,88 Z" fill="#fef08a" opacity="0.95" stroke="#d97706" stroke-width="1.5"/>
+                        <path d="M 45,45 L 30,50 L 45,55 Z" fill="#ef4444"/>
+                        <path d="M 100,30 L 82,36 L 100,42 Z" fill="#ef4444"/>
+                    </g>
+
+                    <!-- Title Text -->
+                    <text x="450" y="392" text-anchor="middle" fill="#fef08a" font-family="'Cinzel', Georgia, serif" font-size="22" font-weight="bold" letter-spacing="3">JEJAK REMPAH NUSANTARA</text>
+                    <text x="450" y="418" text-anchor="middle" fill="#f59e0b" font-family="sans-serif" font-size="11" letter-spacing="2" opacity="0.9">JALUR MARITIM & PERADABAN SUMATERA KUNO</text>
+                </svg>
+            </div>
+            <div style="padding: 1.5rem; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
+                <div id="loadingContainer" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                    <p id="loadingStatusText" style="font-size: 0.85rem; color: var(--amber-light); font-weight: 600;">Memuat Media Pembelajaran Interaktif... 0%</p>
+                    <div class="progress-bar-bg">
+                        <div id="progressFill" class="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <button id="btnStartApp" onclick="startAppWithSound()" class="btn-primary" style="display: none; padding: 0.9rem 2.5rem; font-size: 1.1rem; box-shadow: 0 0 25px rgba(245, 158, 11, 0.5); animation: pulseGlow 2s infinite ease-in-out;">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <span>MULAI JELAJAH</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER BAR -->
+    <header>
+        <div class="header-container">
+            <div class="brand-logo" onclick="switchTab('beranda')">
+                <div class="brand-icon">
+                    <div class="brand-icon-inner">
+                        <!-- SVG Compass Icon -->
+                        <svg class="svg-icon floating-avatar" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 13v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="brand-title">JEJAK REMPAH <span style="color:#fff;">SUMATRA</span></h1>
+                    <p class="brand-subtitle">Tur Sejarah Maritim Bersama Bimantara • Standalone Offline Mode</p>
+                </div>
+            </div>
+
+            <!-- Audio Toggle -->
+            <button id="soundBtn" onclick="toggleAudio()" class="btn-icon" title="Efek Suara">
+                <svg id="soundIcon" class="svg-icon" viewBox="0 0 24 24">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- MAIN NAVIGATION TABS -->
+        <nav>
+            <div class="nav-container custom-scrollbar">
+                <button onclick="switchTab('beranda')" id="nav-beranda" class="nav-tab active">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    <span>Beranda & Tur</span>
+                </button>
+                <button onclick="switchTab('peta')" id="nav-peta" class="nav-tab">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+                    <span>Peta Rempah Sumatra</span>
+                </button>
+                <button onclick="switchTab('katalog')" id="nav-katalog" class="nav-tab">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                    <span>Ensiklopedia Rempah</span>
+                </button>
+                <button onclick="switchTab('jalur')" id="nav-jalur" class="nav-tab">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 21c-1.39 0-2.78-.47-4-1.32-2.44 1.71-5.56 1.71-8 0C6.78 20.53 5.39 21 4 21H2v2h2c1.38 0 2.74-.35 4-.99 2.52 1.29 5.48 1.29 8 0 1.26.64 2.62.99 4 .99h2v-2h-2zM3.95 19H4c1.6 0 3.02-.88 4-2 .98 1.12 2.4 2 4 2s3.02-.88 4-2c.98 1.12 2.4 2 4 2h.05l1.89-6.68c.08-.26.01-.54-.17-.74L18 8.5V3c0-.55-.45-1-1-1H7c-.55 0-1 .45-1 1v5.5L2.23 11.58c-.18.2-.25.48-.17.74L3.95 19z"/></svg>
+                    <span>Jalur Maritim Kuno</span>
+                </button>
+                <button onclick="switchTab('ai-bimantara')" id="nav-ai-bimantara" class="nav-tab">
+                    <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 0-.9-3.8 8.5 8.5 0 0 0-7.6-4.7 8.38 8.38 0 0 0-3.8.9L3 2.5l1.4 5.7A8.38 8.38 0 0 0 3.5 12a8.5 8.5 0 0 0 4.7 7.6 8.38 8.38 0 0 0 3.8.9h.5a8.5 8.5 0 0 0 8.5-8.5v-.5z"/></svg>
+                    <span>Tanya Bimantara (AI Offline)</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- ================= SECTION 1: BERANDA ================= -->
+        <section id="tab-beranda" class="tab-content active">
+            <div class="hero-banner">
+                <div class="grid-12">
+                    <div class="col-span-4" style="text-align: center;">
+                        <div class="avatar-box">
+                            <div class="avatar-inner">
+                                <svg class="svg-icon-lg floating-avatar" style="color: var(--amber-light); margin-bottom: 0.5rem;" viewBox="0 0 24 24">
+                                    <path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z"/>
+                                </svg>
+                                <span style="font-family: var(--serif-font); font-weight:700; color:#fef08a; font-size:1.1rem;">BIMANTARA</span>
+                                <span style="font-size: 0.65rem; color: var(--amber-light); text-transform: uppercase; letter-spacing: 0.1em; font-weight:600;">Pemandu Sejarah Maritim</span>
+                            </div>
+                        </div>
+                        <div class="badge-status">
+                            <span class="badge-dot"></span>
+                            <span>Siap Memandu Offline!</span>
+                        </div>
+                    </div>
+
+                    <div class="col-span-8" style="display: flex; flex-direction: column; justify-content: center; gap: 1rem;">
+                        <div style="display: inline-block; background: rgba(217, 119, 6, 0.15); color: var(--amber-light); padding: 4px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(217, 119, 6, 0.3); width: fit-content;">
+                            Modul Sejarah SMA Kelas X • Jalur Rempah Sumatera Masa Kuno
+                        </div>
+                        <h2 style="font-family: var(--serif-font); font-size: 2rem; font-weight: 800; color: #fff; line-height: 1.2;">
+                            "Selamat Datang di Samudra Masa Lalu, Sobat Sejarah!"
+                        </h2>
+                        <div class="paper-texture" style="padding: 1.25rem; font-size: 0.9rem; position: relative;">
+                            <p style="margin-bottom: 0.5rem; font-weight: 500;">
+                                Tahukah kamu bahwa ribuan tahun sebelum bangsa Eropa datang menjajah, pulau Sumatera (*Suvarnadvipa*) sudah menjadi pusat peradaban rempah dunia? Dari Barus di pesisir barat hingga Kerajaan Sriwijaya di Selat Malaka, wewangian dan rasa rempah Sumatera dicari oleh Para Firaun Mesir, Kaisar Tiongkok, hingga Bangsawan Romawi!
+                            </p>
+                            <p style="font-size: 0.8rem; color: #78350f; font-weight: 700; font-style: italic;">
+                                Mari ikuti penjelajahanku! Pilih menu di atas atau klik tombol eksplorasi di bawah untuk mulai membedah misteri Kapur Barus, Kemenyan, Lada Hitam, dan Kayu Manis secara offline.
+                            </p>
+                        </div>
+
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                            <button onclick="switchTab('peta')" class="btn-primary">
+                                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></svg>
+                                <span>Buka Peta Interaktif</span>
+                            </button>
+                            <button onclick="switchTab('katalog')" class="btn-secondary">
+                                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                                <span>Pelajari Rempah Utama</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Objectives Grid -->
+            <div class="grid-cards">
+                <div class="card">
+                    <div class="card-icon">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 21l3.39-.62C9.28 20.73 10.6 21 12 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 16c-1.25 0-2.45-.3-3.52-.84l-.25-.13-2.03.37.38-1.99-.16-.26C5.87 15.1 5 13.62 5 12c0-3.86 3.14-7 7-7s7 3.14 7 7-3.14 7-7 7z"/></svg>
+                    </div>
+                    <h3 style="font-family: var(--serif-font); color: var(--amber-light); font-size: 1.1rem; margin-bottom: 0.5rem;">1. Jenis & Kegunaan Rempah</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">
+                        Mengidentifikasi komoditas unggulan Sumatera kuno seperti Kapur Barus, Kemenyan, Lada Hitam, dan Kayu Manis serta fungsinya dalam pengobatan, ritual, pembaluman mayat, dan pengawetan makanan.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 13v1c0 1.1.9 2 2 2v1.93z"/></svg>
+                    </div>
+                    <h3 style="font-family: var(--serif-font); color: var(--amber-light); font-size: 1.1rem; margin-bottom: 0.5rem;">2. Peta & Pelabuhan Kuno</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">
+                        Menganalisis peran strategis bandar pelabuhan kuno Sumatera seperti Barus (Fansur) dan Sriwijaya dalam jaringan Perdagangan Jalur Sutra Maritim Dunia.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 13v1c0 1.1.9 2 2 2v1.93z"/></svg>
+                    </div>
+                    <h3 style="font-family: var(--serif-font); color: var(--amber-light); font-size: 1.1rem; margin-bottom: 0.5rem;">3. Interaksi Antar-Peradaban</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">
+                        Memahami dampak ekonomi, sosial, dan budaya dari hubungan dagang Sumatera kuno dengan Tiongkok, India, Arab-Persia, hingga Kekaisaran Romawi sebelum era kolonialisme.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 2: PETA REMPAH ================= -->
+        <section id="tab-peta" class="tab-content">
+            <div style="background-color: var(--bg-card); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+                <div>
+                    <h2 style="font-family: var(--serif-font); color: var(--amber-light); font-size: 1.3rem; font-weight:700;">
+                        Peta Persebaran Rempah & Pelabuhan Kuno Sumatera
+                    </h2>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">Klik titik-titik lokasi pelabuhan pada peta untuk mempelajari komoditas utama dan perannya!</p>
+                </div>
+                <div style="font-size: 0.75rem; background-color: #292524; padding: 6px 12px; border-radius: 8px; border: 1px solid #44403c; display:flex; align-items:center; gap:0.5rem;">
+                    <span style="width:10px; height:10px; border-radius:50%; background-color: var(--amber-main);"></span>
+                    <span>Titik Pusat Rempah / Pelabuhan Utama</span>
+                </div>
+            </div>
+
+            <div class="grid-12">
+                <div class="col-span-7 map-container">
+                    <div style="text-align: center; font-size: 0.75rem; color: var(--amber-light); font-family: monospace; margin-bottom: 0.5rem;">PETA SUMATERA MASA KUNO (SUVARNADVIPA)</div>
+                    
+                    <svg viewBox="0 0 800 600" style="width:100%; height:auto; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); select-none;" id="sumatraMap">
+                        <rect width="800" height="600" fill="#0c1d28" rx="12"/>
+                        <path d="M0 150 H800 M0 300 H800 M0 450 H800 M200 0 V600 M400 0 V600 M600 0 V600" stroke="#1e3442" stroke-width="1" stroke-dasharray="4,4"/>
+                        
+                        <path d="M 120 70 C 180 90, 240 140, 320 210 C 400 280, 480 340, 560 410 C 620 470, 680 520, 710 560 C 680 570, 620 560, 580 530 C 520 480, 450 430, 380 360 C 310 290, 220 200, 160 140 C 110 90, 90 75, 120 70 Z" 
+                              fill="#222b22" stroke="#d97706" stroke-width="2.5" />
+                        
+                        <text x="380" y="220" fill="#00b4d8" font-size="14" font-family="serif" font-weight="bold" transform="rotate(-32, 380, 220)" opacity="0.6">SELAT MALAKA (JALUR UTAMA)</text>
+                        <text x="180" y="380" fill="#00b4d8" font-size="14" font-family="serif" font-weight="bold" transform="rotate(-35, 180, 380)" opacity="0.5">SAMUDRA HINDIA</text>
+
+                        <!-- BARUS -->
+                        <g style="cursor:pointer;" onclick="showLocationDetails('barus')">
+                            <circle cx="210" cy="180" r="16" fill="#d97706" opacity="0.3" class="ping-glow"/>
+                            <circle cx="210" cy="180" r="8" fill="#f59e0b" stroke="#ffffff" stroke-width="2"/>
+                            <text x="140" y="175" fill="#fef08a" font-size="13" font-weight="bold">Pelabuhan Barus</text>
+                            <text x="140" y="190" fill="#cbd5e1" font-size="10">(Pusat Kapur & Kemenyan)</text>
+                        </g>
+
+                        <!-- LAMURI -->
+                        <g style="cursor:pointer;" onclick="showLocationDetails('lamuri')">
+                            <circle cx="130" cy="85" r="14" fill="#d97706" opacity="0.3" class="ping-glow"/>
+                            <circle cx="130" cy="85" r="7" fill="#f59e0b" stroke="#ffffff" stroke-width="2"/>
+                            <text x="145" y="80" fill="#fef08a" font-size="13" font-weight="bold">Lamuri (Aceh Kuno)</text>
+                            <text x="145" y="94" fill="#cbd5e1" font-size="10">(Lada Hitam & Pinang)</text>
+                        </g>
+
+                        <!-- SRIWIJAYA -->
+                        <g style="cursor:pointer;" onclick="showLocationDetails('sriwijaya')">
+                            <circle cx="580" cy="460" r="18" fill="#ef4444" opacity="0.3" class="ping-glow"/>
+                            <circle cx="580" cy="460" r="9" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+                            <text x="600" y="455" fill="#fca5a5" font-size="14" font-weight="bold">Ibu Kota Sriwijaya</text>
+                            <text x="600" y="470" fill="#cbd5e1" font-size="10">(Emporium Perdagangan Dunia)</text>
+                        </g>
+
+                        <!-- KERINCI -->
+                        <g style="cursor:pointer;" onclick="showLocationDetails('kerinci')">
+                            <circle cx="370" cy="330" r="14" fill="#10b981" opacity="0.3" class="ping-glow"/>
+                            <circle cx="370" cy="330" r="7" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
+                            <text x="250" y="330" fill="#a7f3d0" font-size="13" font-weight="bold">Pedalaman Kerinci</text>
+                            <text x="250" y="344" fill="#cbd5e1" font-size="10">(Kayu Manis / Cassia)</text>
+                        </g>
+
+                        <!-- LAMPUNG -->
+                        <g style="cursor:pointer;" onclick="showLocationDetails('lampung')">
+                            <circle cx="680" cy="530" r="14" fill="#d97706" opacity="0.3" class="ping-glow"/>
+                            <circle cx="680" cy="530" r="7" fill="#f59e0b" stroke="#ffffff" stroke-width="2"/>
+                            <text x="570" y="535" fill="#fef08a" font-size="12" font-weight="bold">Wilayah Lampung</text>
+                            <text x="570" y="548" fill="#cbd5e1" font-size="10">(Pusat Lada Hitam Selatan)</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="col-span-5 card" id="locationDetailPanel">
+                    <div id="defaultLocationMsg" style="text-align: center; padding: 3rem 1rem; display: flex; flex-direction: column; gap: 1rem; align-items: center;">
+                        <svg class="svg-icon-lg" style="color: var(--amber-light);" viewBox="0 0 24 24"><path d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74z"/></svg>
+                        <h3 style="font-family: var(--serif-font); color: var(--amber-light); font-size: 1.1rem;">Pilih Lokasi pada Peta</h3>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); max-width: 280px;">
+                            Klik salah satu titik emas / merah pada peta Sumatera di samping untuk melihat penjelasan peranan wilayah tersebut secara offline!
+                        </p>
+                    </div>
+
+                    <div id="activeLocationContent" style="display: none; display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+                            <div id="locIcon" style="width: 40px; height: 40px; border-radius: 8px; background-color: rgba(217, 119, 6, 0.2); color: var(--amber-light); display:flex; align-items:center; justify-content:center;">
+                            </div>
+                            <div>
+                                <h3 id="locTitle" style="font-family: var(--serif-font); font-size: 1.2rem; color: var(--amber-light);">Nama Wilayah</h3>
+                                <p id="locSubtitle" style="font-size: 0.75rem; color: var(--amber-main); font-weight:600;">Subjudul</p>
+                            </div>
+                        </div>
+
+                        <div class="paper-texture" style="padding: 1rem; font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                            <h4 style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #78350f;">Komoditas Utama:</h4>
+                            <p id="locSpices" style="font-weight: 700; color: #451a03;"></p>
+                            
+                            <h4 style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #78350f; margin-top: 0.5rem;">Peran Sejarah:</h4>
+                            <p id="locDescription" style="color: #292524; leading-height:1.4;"></p>
+                        </div>
+
+                        <div style="background-color: #292524; padding: 0.75rem; border-radius: 12px; border: 1px solid #44403c;">
+                            <span style="font-size: 0.75rem; font-weight:700; color: var(--amber-light);">Catatan Bimantara:</span>
+                            <p id="locBimantaraNote" style="font-size: 0.75rem; color: var(--text-main); font-style: italic; margin-top:0.25rem;"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 3: ENSIKLOPEDIA REMPAH ================= -->
+        <section id="tab-katalog" class="tab-content">
+            <div style="background-color: var(--bg-card); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+                <h2 style="font-family: var(--serif-font); color: var(--amber-light); font-size: 1.3rem; font-weight:700;">
+                    Ensiklopedia Rempah Utama Sumatera Masa Kuno
+                </h2>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Pelajari karakteristik, kegunaan dalam peradaban kuno, dan daerah asal rempah-rempah bernilai emas.</p>
+            </div>
+
+            <div class="grid-cards">
+                <!-- KAPUR BARUS -->
+                <div class="spice-card">
+                    <div>
+                        <div class="spice-img-box">
+                            <svg class="svg-icon-lg" style="color: rgba(254,240,138,0.4);" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            <span class="spice-tag">Langka & Mahal</span>
+                        </div>
+                        <div style="padding: 1.25rem; display:flex; flex-direction:column; gap:0.5rem;">
+                            <h3 style="font-family: var(--serif-font); color: var(--amber-light); font-size: 1.2rem;">Kapur Barus (Camphor)</h3>
+                            <p style="font-size: 0.75rem; color: var(--amber-main); font-family: monospace;">Dryobalanops aromatica</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Getah kristal wangi dari pohon kayu kapur di pesisir barat Sumatera (Barus). Sangat langka dan dicari bangsa asing.</p>
+                        </div>
+                    </div>
+                    <div style="padding: 1.25rem; padding-top: 0;">
+                        <button onclick="openSpiceModal('kapur')" class="btn-secondary" style="width: 100%; justify-content: center; font-size: 0.8rem;">
+                            Detail Kegunaan Kuno
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KEMENYAN -->
+                <div class="spice-card">
+                    <div>
+                        <div class="spice-img-box">
+                            <svg class="svg-icon-lg" style="color: rgba(254,240,138,0.4);" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
+                            <span class="spice-tag">Getah Suci</span>
+                        </div>
+                        <div style="padding: 1.25rem; display:flex; flex-direction:column; gap:0.5rem;">
+                            <h3 style="font-family: var(--serif-font); color: var(--amber-light); font-size: 1.2rem;">Kemenyan (Benzoin)</h3>
+                            <p style="font-size: 0.75rem; color: var(--amber-main); font-family: monospace;">Styrax benzoin</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Resin wangi alami aromatik. Digunakan dalam ritual keagamaan di kuil Tiongkok, Mesir, hingga gereja kuno Timur Tengah.</p>
+                        </div>
+                    </div>
+                    <div style="padding: 1.25rem; padding-top: 0;">
+                        <button onclick="openSpiceModal('kemenyan')" class="btn-secondary" style="width: 100%; justify-content: center; font-size: 0.8rem;">
+                            Detail Kegunaan Kuno
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LADA HITAM -->
+                <div class="spice-card">
+                    <div>
+                        <div class="spice-img-box">
+                            <svg class="svg-icon-lg" style="color: rgba(254,240,138,0.4);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>
+                            <span class="spice-tag">Emas Hitam</span>
+                        </div>
+                        <div style="padding: 1.25rem; display:flex; flex-direction:column; gap:0.5rem;">
+                            <h3 style="font-family: var(--serif-font); color: var(--amber-light); font-size: 1.2rem;">Lada Hitam (Black Pepper)</h3>
+                            <p style="font-size: 0.75rem; color: var(--amber-main); font-family: monospace;">Piper nigrum</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Biji rempah pedas pengawet daging dan penyedap utama. Menjadi alat pembayaran berharga layaknya mata uang di dunia kuno.</p>
+                        </div>
+                    </div>
+                    <div style="padding: 1.25rem; padding-top: 0;">
+                        <button onclick="openSpiceModal('lada')" class="btn-secondary" style="width: 100%; justify-content: center; font-size: 0.8rem;">
+                            Detail Kegunaan Kuno
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KAYU MANIS -->
+                <div class="spice-card">
+                    <div>
+                        <div class="spice-img-box">
+                            <svg class="svg-icon-lg" style="color: rgba(254,240,138,0.4);" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+                            <span class="spice-tag">Kulit Kayu Wangi</span>
+                        </div>
+                        <div style="padding: 1.25rem; display:flex; flex-direction:column; gap:0.5rem;">
+                            <h3 style="font-family: var(--serif-font); color: var(--amber-light); font-size: 1.2rem;">Kayu Manis (Cinnamon)</h3>
+                            <p style="font-size: 0.75rem; color: var(--amber-main); font-family: monospace;">Cinnamomum burmannii</p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Kulit kayu manis khas pegunungan Sumatera. Dikenal sejak era Romawi dan Mesir kuno untuk wewangian dan obat-obatan.</p>
+                        </div>
+                    </div>
+                    <div style="padding: 1.25rem; padding-top: 0;">
+                        <button onclick="openSpiceModal('kayumanis')" class="btn-secondary" style="width: 100%; justify-content: center; font-size: 0.8rem;">
+                            Detail Kegunaan Kuno
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 4: JALUR MARITIM ================= -->
+        <section id="tab-jalur" class="tab-content">
+            <div style="background-color: var(--bg-card); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+                <h2 style="font-family: var(--serif-font); color: var(--amber-light); font-size: 1.3rem; font-weight:700;">
+                    Jalur Perdagangan Maritim Kuno (Jalur Sutra & Rempah Laut)
+                </h2>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">
+                    Bagaimana Sumatera menjadi persimpangan utama yang menghubungkan Dunia Barat (Romawi/Arab/India) dengan Dunia Timur (Tiongkok).
+                </p>
+            </div>
+
+            <div class="card" style="display:flex; flex-direction:column; gap:1.5rem;">
+                <div style="overflow-x: auto; padding: 1rem 0;">
+                    <div style="min-width: 650px; display:flex; justify-content:space-between; align-items:center; background:#0c0a09; padding: 2rem 1.5rem; border-radius:12px; position:relative; border: 1px solid var(--border-color);">
+                        <div style="position:absolute; top:50%; left:60px; right:60px; height:4px; background: linear-gradient(to right, #2563eb, var(--amber-main), #dc2626); transform:translateY(-50%); z-index:0;"></div>
+
+                        <!-- Node 1 -->
+                        <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; cursor:pointer;" onclick="showTradeRouteInfo('barat')">
+                            <div style="width:50px; height:50px; border-radius:50%; background:#1c1917; border:2px solid #3b82f6; display:flex; align-items:center; justify-content:center; color:#60a5fa;">
+                                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10z"/></svg>
+                            </div>
+                            <span style="font-family: var(--serif-font); font-size:0.75rem; font-weight:700; color:#93c5fd; margin-top:0.5rem;">Dunia Barat</span>
+                            <span style="font-size:0.65rem; color:var(--text-muted);">Mesir & Romawi</span>
+                        </div>
+
+                        <!-- Node 2 -->
+                        <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; cursor:pointer;" onclick="showTradeRouteInfo('arab-india')">
+                            <div style="width:50px; height:50px; border-radius:50%; background:#1c1917; border:2px solid var(--amber-main); display:flex; align-items:center; justify-content:center; color:var(--amber-light);">
+                                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/></svg>
+                            </div>
+                            <span style="font-family: var(--serif-font); font-size:0.75rem; font-weight:700; color:var(--amber-light); margin-top:0.5rem;">Timur Tengah & India</span>
+                            <span style="font-size:0.65rem; color:var(--text-muted);">Gujarat, Malabar</span>
+                        </div>
+
+                        <!-- Node 3 -->
+                        <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; cursor:pointer;" onclick="showTradeRouteInfo('sumatra')">
+                            <div style="width:60px; height:60px; border-radius:50%; background:var(--amber-main); border:3px solid #fef08a; display:flex; align-items:center; justify-content:center; color:#000;" class="ping-glow">
+                                <svg class="svg-icon-lg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 13v1c0 1.1.9 2 2 2v1.93z"/></svg>
+                            </div>
+                            <span style="font-family: var(--serif-font); font-size:0.8rem; font-weight:800; color:var(--amber-light); margin-top:0.5rem;">SUMATERA (POROS DUNIA)</span>
+                            <span style="font-size:0.65rem; color:#fef08a;">Barus & Sriwijaya</span>
+                        </div>
+
+                        <!-- Node 4 -->
+                        <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; cursor:pointer;" onclick="showTradeRouteInfo('tiongkok')">
+                            <div style="width:50px; height:50px; border-radius:50%; background:#1c1917; border:2px solid #ef4444; display:flex; align-items:center; justify-content:center; color:#fca5a5;">
+                                <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2l-5.5 9h11zM12 22l5.5-9h-11z"/></svg>
+                            </div>
+                            <span style="font-family: var(--serif-font); font-size:0.75rem; font-weight:700; color:#fca5a5; margin-top:0.5rem;">Dunia Timur</span>
+                            <span style="font-size:0.65rem; color:var(--text-muted);">Dinasti Tang & Song</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="paper-texture" style="padding:1.25rem;" id="tradeRouteInfoBox">
+                    <h3 style="font-family: var(--serif-font); font-size:1.1rem; font-weight:700; color:#78350f; margin-bottom:0.5rem;" id="routeTitle">
+                        Klik Node Jalur Perdagangan Di Atas
+                    </h3>
+                    <p style="font-size:0.85rem; color:#292524;" id="routeDesc">
+                        Pilih salah satu simpul wilayah di atas untuk mempelajari bagaimana aliran barang, kapal jung maritim, angin muson, serta pertukaran komoditas berlangsung antara Sumatera dengan peradaban luar pada masa kuno!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 5: TANYA BIMANTARA (OFFLINE AI) ================= -->
+        <section id="tab-ai-bimantara" class="tab-content">
+            <div style="background-color: var(--bg-card); padding: 1.25rem; border-radius: 16px; border: 1px solid var(--border-color); margin-bottom: 1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                    <div style="width:40px; height:40px; border-radius:50%; background-color:rgba(217,119,6,0.2); color:var(--amber-light); display:flex; align-items:center; justify-content:center;">
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+                    </div>
+                    <div>
+                        <h2 style="font-family: var(--serif-font); color: var(--amber-light); font-size: 1.2rem; font-weight:700;">Tanya Bimantara (Asisten Offline Sejarah)</h2>
+                        <p style="font-size: 0.75rem; color: var(--text-muted);">Tanyakan fakta seputar Kapur Barus, Sriwijaya, atau Jalur Rempah secara instant tanpa perlu internet!</p>
+                    </div>
+                </div>
+                <div style="font-size:0.7rem; background-color: rgba(34,197,94,0.15); color:#4ade80; padding:4px 10px; border-radius:9999px; border:1px solid rgba(34,197,94,0.3); font-weight:600;">
+                    100% Standalone Offline Mode
+                </div>
+            </div>
+
+            <div class="chat-box">
+                <div id="chatMessages" class="chat-messages custom-scrollbar">
+                    <div class="msg-row bimantara">
+                        <div class="msg-avatar">B</div>
+                        <div class="msg-bubble">
+                            <strong style="color: var(--amber-light); display:block; margin-bottom:0.25rem;">Bimantara:</strong>
+                            Halo! Saya Bimantara. Karena kita dalam mode 100% Offline Standalone, kamu tetap bisa menanyakan berbagai hal tentang Kapur Barus, Kerajaan Sriwijaya, Lada Hitam, Kayu Manis, atau Jalur Sutra Maritim Sumatera! Coba pilih pertanyaan cepat di bawah atau ketik pertanyaanmu!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-q-bar custom-scrollbar">
+                    <span style="font-size: 0.7rem; color: var(--text-muted); align-self: center; font-weight:600;">Pertanyaan Cepat:</span>
+                    <button onclick="sendQuickQuestion('Mengapa Kapur Barus sangat terkenal di Mesir Kuno?')" class="btn-chip">
+                        Kapur Barus di Mesir Kuno?
+                    </button>
+                    <button onclick="sendQuickQuestion('Bagaimana peran Kerajaan Sriwijaya dalam perdagangan rempah?')" class="btn-chip">
+                        Peran Sriwijaya?
+                    </button>
+                    <button onclick="sendQuickQuestion('Mengapa Lada Hitam disebut Emas Hitam?')" class="btn-chip">
+                        Kenapa Lada disebut Emas Hitam?
+                    </button>
+                </div>
+
+                <form id="chatForm" onsubmit="handleChatSubmit(event)" class="chat-input-form">
+                    <input type="text" id="chatInput" placeholder="Ketik pertanyaan sejarahmu di sini..." class="input-text">
+                    <button type="submit" class="btn-primary" style="padding: 0.75rem 1rem;">
+                        <span>Kirim</span>
+                        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- SPICE DETAIL MODAL -->
+    <div id="spiceModal" class="modal-overlay">
+        <div class="modal-container custom-scrollbar">
+            <button onclick="closeSpiceModal()" class="close-btn">&times;</button>
+
+            <div style="display:flex; align-items:center; gap:1rem; border-bottom:1px solid var(--border-color); padding-bottom:1rem; margin-bottom:1rem;">
+                <div id="modalSpiceIcon" style="width:50px; height:50px; border-radius:12px; background:rgba(217,119,6,0.2); color:var(--amber-light); display:flex; align-items:center; justify-content:center;">
+                </div>
+                <div>
+                    <h3 id="modalSpiceTitle" style="font-family: var(--serif-font); font-size:1.3rem; color:var(--amber-light);">Nama Rempah</h3>
+                    <p id="modalSpiceLatin" style="font-size:0.75rem; color:var(--amber-main); font-family:monospace;">Nama Latin</p>
+                </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:1rem;">
+                <div class="paper-texture" style="padding:1rem; font-size:0.85rem;">
+                    <h4 style="font-size:0.7rem; font-weight:700; text-transform:uppercase; color:#78350f; border-bottom:1px solid rgba(120,53,15,0.2); padding-bottom:0.25rem; margin-bottom:0.5rem;">Kegunaan dalam Peradaban Kuno:</h4>
+                    <ul id="modalSpiceUses" style="padding-left:1.25rem; color:#292524; display:flex; flex-direction:column; gap:0.25rem;"></ul>
+                </div>
+
+                <div style="background-color:#292524; padding:1rem; border-radius:12px; border:1px solid #44403c; font-size:0.8rem;">
+                    <h4 style="font-weight:700; color:var(--amber-light); margin-bottom:0.25rem;">Jangkauan Ekspor & Konsumen Utama:</h4>
+                    <p id="modalSpiceExport" style="color:var(--text-main);"></p>
+                </div>
+
+                <div style="background-color:#0c0a09; padding:1rem; border-radius:12px; border:1px solid var(--border-amber); font-size:0.8rem;">
+                    <span style="color:var(--amber-light); font-weight:700;">Catatan Khusus Sejarah:</span>
+                    <p id="modalSpiceHistoryNote" style="color:var(--text-muted); font-style:italic; margin-top:0.25rem;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <div style="max-w-7xl; margin:0 auto; display:flex; flex-direction:column; gap:0.25rem;">
+            <p style="font-family: var(--serif-font); color: var(--text-main);">Media Pembelajaran Interaktif Sejarah Kelas X SMA • Rempah Sumatra Masa Kuno</p>
+            <p>Standalone Offline Edition • Tanpa Ketergantungan CDN / API Luar</p>
+        </div>
+    </footer>
+
+    <script>
+        // Web Audio API for sound effect
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new AudioCtx();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+                }
+            } catch(e) { console.log('Audio init offline'); }
+        }
+
+        // Play musical fanfare when starting exploration
+        function playStartFanfare() {
+            if (!soundEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new AudioCtx();
+                const now = audioCtx.currentTime;
+                const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5 chord
+                
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + (idx * 0.12));
+                    
+                    gain.gain.setValueAtTime(0.12, now + (idx * 0.12));
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + (idx * 0.12) + 0.6);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.start(now + (idx * 0.12));
+                    osc.stop(now + (idx * 0.12) + 0.6);
+                });
+            } catch(e) { console.log('Fanfare error'); }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            let progress = 0;
+            const progressFill = document.getElementById('progressFill');
+            const loadingStatusText = document.getElementById('loadingStatusText');
+            const btnStartApp = document.getElementById('btnStartApp');
+            const loadingContainer = document.getElementById('loadingContainer');
+
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 15) + 12;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        if (loadingContainer) loadingContainer.style.display = 'none';
+                        if (btnStartApp) btnStartApp.style.display = 'inline-flex';
+                    }, 250);
+                }
+                if (progressFill) progressFill.style.width = progress + '%';
+                if (loadingStatusText) loadingStatusText.innerText = `Menyiapkan Modul Sejarah Bimantara... ${progress}%`;
+            }, 100);
+        });
+
+        function startAppWithSound() {
+            playSound('click');
+            playStartFanfare();
+            const splash = document.getElementById('splashScreen');
+            if (splash) {
+                splash.classList.add('hidden-splash');
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                }, 850);
+            }
+        }
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('soundBtn');
+            btn.style.opacity = soundEnabled ? "1" : "0.5";
+        }
+
+        // TAB SWITCHING
+        function switchTab(tabId) {
+            playSound('click');
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if(activeNav) activeNav.classList.add('active');
+        }
+
+        // MAP LOCATIONS DATA
+        const locationData = {
+            barus: {
+                title: "Pelabuhan Barus (Fansur)",
+                subtitle: "Pelabuhan Tertua Pesisir Barat Sumatra",
+                spices: "Kapur Barus (Camphor) & Kemenyan (Benzoin Resin)",
+                description: "Barus sudah tercatat dalam peta ahli geografi Yunani Ptolemaeus (abad ke-2 M) dengan nama 'Barousai'. Pelabuhan ini merupakan gerbang utama perdagangan kapur murni yang dipanen dari pedalaman hutan Tapanuli.",
+                note: "Literatur kuno mencatat bahwa senyawa Kapur Barus Barus digunakan dalam proses pengawetan mumi para Firaun di Mesir Kuno!"
+            },
+            lamuri: {
+                title: "Kerajaan Lamuri (Aceh Kuno)",
+                subtitle: "Ujung Utara Pintu Masuk Selat Malaka",
+                spices: "Lada Hitam, Biji Pinang, & Kayu Cendana",
+                description: "Lamuri menjadi tempat persinggahan utama kapal-kapal dari India, Arab, dan Tiongkok sebelum melintasi Selat Malaka atau mengarungi Samudra Hindia.",
+                note: "Musafir Tiongkok Zhao Rugua dan Marco Polo mencatat Lamuri sebagai penghasil lada berkualitas tinggi."
+            },
+            sriwijaya: {
+                title: "Kerajaan Sriwijaya (Palembang/Jambi)",
+                subtitle: "Emporium Maritim Terbesar di Asia Tenggara",
+                spices: "Pusat Pengumpul (Emporium) Semua Rempah Nusantara",
+                description: "Sriwijaya menguasai Selat Malaka dan Selat Sunda. Kerajaan ini tidak hanya menjual rempah asli Sumatera tetapi juga mengontrol distribusi cengkeh & pala dari Maluku ke seluruh dunia.",
+                note: "I-Tsing (biksu Tiongkok) mencatat Sriwijaya memiliki ribuan biksu dan kapal-kapal dagang raksasa yang berlayar hingga ke India."
+            },
+            kerinci: {
+                title: "Wilayah Pedalaman Kerinci & Minangkabau",
+                subtitle: "Penghasil Kayu Manis Terbaik (Cassia Vera)",
+                spices: "Kayu Manis (Cinnamon) & Hasil Hutan",
+                description: "Masyarakat pedalaman menguliti batang pohon Cinnamomum burmannii. Kayu manis ini diangkut melalui sungai-sungai besar ke pesisir timur dan barat Sumatera.",
+                note: "Kayu manis Sumatera sangat diminati bangsa Romawi untuk ramuan obat dan aroma terapi aristokrat."
+            },
+            lampung: {
+                title: "Pesisir Lampung",
+                subtitle: "Lumbung Lada Hitam Selatan",
+                spices: "Lada Hitam (Piper nigrum)",
+                description: "Pesisir selatan Sumatera menjadi wilayah produktif budidaya lada hitam yang berhadapan langsung dengan Selat Sunda.",
+                note: "Lada hitam dari Lampung menjadi salah satu komoditas utama yang diekspor ke pelabuhan Sunda Kelapa dan Jawa."
+            }
+        };
+
+        function showLocationDetails(key) {
+            playSound('click');
+            const data = locationData[key];
+            if (!data) return;
+
+            document.getElementById('defaultLocationMsg').style.display = 'none';
+            document.getElementById('activeLocationContent').style.display = 'flex';
+
+            document.getElementById('locIcon').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 13v1c0 1.1.9 2 2 2v1.93z"/></svg>`;
+            document.getElementById('locTitle').innerText = data.title;
+            document.getElementById('locSubtitle').innerText = data.subtitle;
+            document.getElementById('locSpices').innerText = data.spices;
+            document.getElementById('locDescription').innerText = data.description;
+            document.getElementById('locBimantaraNote').innerText = `"${data.note}"`;
+        }
+
+        // SPICE DETAILS MODAL
+        const spiceDetails = {
+            kapur: {
+                title: "Kapur Barus (Camphor)",
+                latin: "Dryobalanops aromatica",
+                uses: [
+                    "Bahan utama ramuan balsam pengawetan mumi (Mesir Kuno).",
+                    "Obat antiseptik, pereda nyeri, dan penawar racun (Tiongkok & Yunani).",
+                    "Wewangian bangsawan dan dupa ritual keagamaan."
+                ],
+                export: "Pesisir Barat Sumatra (Barus) → India → Timur Tengah (Arab/Persia) → Kekaisaran Romawi & Mesir.",
+                note: "Harganya pada masa kuno melebihi nilai emas karena proses pengambilan getah kristalnya di dalam batang pohon tua sangat sulit!"
+            },
+            kemenyan: {
+                title: "Kemenyan (Benzoin Resin)",
+                latin: "Styrax benzoin",
+                uses: [
+                    "Bahan utama dupa pembakaran dalam ritual ibadah di Kuil Tiongkok & gereja kuno.",
+                    "Obat herbal penyakit pernapasan dan asma.",
+                    "Bahan pengawet organik & industri parfum kuno."
+                ],
+                export: "Sumatra Utara / Tapanuli → Sriwijaya → Tiongkok, India, dan Jazirah Arab.",
+                note: "Bangsa Arab menyebut kemenyan sebagai 'Luban Jawi' (Kemenyan dari Tanah Jawa/Sumatera)."
+            },
+            lada: {
+                title: "Lada Hitam (Black Pepper)",
+                latin: "Piper nigrum",
+                uses: [
+                    "Pengawet alami daging untuk musim dingin di Eropa dan Asia Tengah.",
+                    "Penyedap rasa hangat khas masakan istana.",
+                    "Alat tukar/pembayaran pajak yang sah pengganti uang tunai."
+                ],
+                export: "Sumatra (Lamuri, Pedir, Lampung) → Selat Malaka → India → Laut Merah → Eropa.",
+                note: "Sering dijuluki 'Emas Hitam' karena pedagang Arab dan Venesia menjualnya dengan harga selangit di pasar Eropa."
+            },
+            kayumanis: {
+                title: "Kayu Manis (Cinnamon)",
+                latin: "Cinnamomum burmannii",
+                uses: [
+                    "Bumbu penyedap dan pengharum minum-minuman istana.",
+                    "Minyak wewangian aristokrat dan bahan pengobatan lambung.",
+                    "Bahan campuran minyak suci keagamaan."
+                ],
+                export: "Pegunungan Sumatra → Pelabuhan Pesisir → India & Kekaisaran Romawi.",
+                note: "Penulis kuno Romawi, Plinius yang Tua, mencatat kayu manis sebagai komoditas mewah paling dicari oleh elit Romawi."
+            }
+        };
+
+        function openSpiceModal(type) {
+            playSound('click');
+            const data = spiceDetails[type];
+            if (!data) return;
+
+            document.getElementById('modalSpiceTitle').innerText = data.title;
+            document.getElementById('modalSpiceLatin').innerText = data.latin;
+            document.getElementById('modalSpiceIcon').innerHTML = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>`;
+
+            const usesList = document.getElementById('modalSpiceUses');
+            usesList.innerHTML = '';
+            data.uses.forEach(u => {
+                const li = document.createElement('li');
+                li.innerText = u;
+                usesList.appendChild(li);
+            });
+
+            document.getElementById('modalSpiceExport').innerText = data.export;
+            document.getElementById('modalSpiceHistoryNote').innerText = `"${data.note}"`;
+
+            document.getElementById('spiceModal').classList.add('active');
+        }
+
+        function closeSpiceModal() {
+            playSound('click');
+            document.getElementById('spiceModal').classList.remove('active');
+        }
+
+        // TRADE ROUTES DATA
+        const routeData = {
+            barat: {
+                title: "Hubungan dengan Dunia Barat (Mesir & Romawi Kuno)",
+                desc: "Sejak awal masehi, pelaut-pelaut Yunani-Romawi menggunakan angin Muson untuk melintasi Samudra Hindia. Kapur Barus dan Kayu Manis Sumatera dibawa melalui Laut Merah hingga sampai di pelabuhan Alexandria (Mesir) dan Roma."
+            },
+            'arab-india': {
+                title: "Hubungan dengan India & Timur Tengah (Persia/Arab)",
+                desc: "Pedagang India dan Arab membawa kain sutra, kaca, dan perak untuk ditukarkan dengan lada hitam dan kemenyan Sumatera. Mereka juga menyebarkan pengaruh agama Hindu, Buddha, dan kelak Islam di pelabuhan-pelabuhan pesisir Sumatera."
+            },
+            sumatra: {
+                title: "Sumatera / Kerajaan Sriwijaya (Poros Tengah Dunia)",
+                desc: "Sumatera berada di posisi super strategis! Selat Malaka adalah 'leher botol' pelayaran dunia. Sriwijaya menyediakan fasilitas pelabuhan, hukum laut, pergudangan, dan armada militer maritim yang melindungi kapal dagang internasional."
+            },
+            tiongkok: {
+                title: "Hubungan dengan Tiongkok (Dinasti Tang, Song, Ming)",
+                desc: "Tiongkok membutuhkan kemenyan dan kapur barus untuk ritual keagamaan istana dan bahan pengobatan. Sebagai gantinya, kapal-kapal Tiongkok membawa keramik/porselen bernilai tinggi, sutra murni, dan koin perunggu ke Sumatera."
+            }
+        };
+
+        function showTradeRouteInfo(key) {
+            playSound('click');
+            const info = routeData[key];
+            if (!info) return;
+
+            document.getElementById('routeTitle').innerText = info.title;
+            document.getElementById('routeDesc').innerText = info.desc;
+        }
+
+        // LOCAL OFFLINE KNOWLEDGE BASE ENGINE FOR AI BIMANTARA
+        const offlineKnowledgeBase = [
+            {
+                keywords: ["mesir", "mumi", "firaun", "kapur", "barus"],
+                response: "Kapur Barus dari pelabuhan Barus (Sumatera Utara) sangat melegenda di Mesir Kuno! Getah kristal wangi dari pohon Dryobalanops aromatica ini mengandung antiseptik alami yang digunakan oleh para pendeta Mesir Kuno dalam proses pembalseman mumi raja-raja dan bangsawan Firaun agar awet serta beraroma wangi."
+            },
+            {
+                keywords: ["sriwijaya", "peran", "kerajaan", "emporium", "selat malaka"],
+                response: "Kerajaan Sriwijaya berperan sebagai Emporium (Pusat Perdagangan Transito Maritim) terbesar di Asia Tenggara. Berlokasi strategis di Selat Malaka, Sriwijaya tidak hanya menjual kapur barus dan lada Sumatera, tetapi juga mengontrol lalu lintas kapal, memungut cukai, serta menyediakan armada militer laut yang aman dari bajak laut."
+            },
+            {
+                keywords: ["lada", "emas hitam", "hitam", "uang", "mahal"],
+                response: "Lada Hitam disebut sebagai 'Emas Hitam' karena nilainya sangat fantastis di pasar dunia kuno! Di Eropa dan Timur Tengah, lada hitam digunakan sebagai pengawet daging saat musim dingin tiba, penyedap rasa istana, bahkan dijadikan alat tukar pembayaran pajak yang sah menggantikan uang koin."
+            },
+            {
+                keywords: ["kemenyan", "benzoin", "dupa", "ritual", "arab"],
+                response: "Kemenyan (Benzoin Resin) yang dipanen di pegunungan Sumatera Utara sangat disukai oleh bangsa Arab dan Tiongkok. Di Arab, kemenyan disebut 'Luban Jawi'. Dupa harum ini dibakar untuk ritual keagamaan di kuil, gereja kuno, serta dijadikan campuran parfum dan obat pernapasan."
+            },
+            {
+                keywords: ["kayu manis", "romawi", "cinnamon", "cassia"],
+                response: "Kayu manis Sumatera (Cinnamomum burmannii / Cassia Vera) dipanen dari kawasan pedalaman Kerinci. Kulit kayu harum ini diangkut melalui sungai menuju laut, lalu diekspor hingga ke Kekaisaran Romawi. Elit Romawi memburunya sebagai aroma terapi mewah dan obat herbal ramuan lambung."
+            },
+            {
+                keywords: ["jalur", "sutra", "maritim", "perdagangan", "angin muson"],
+                response: "Jalur Sutra Maritim adalah rute perdagangan laut dunia yang menghubungkan Tiongkok, Sumatera, India, Arab, hingga Eropa. Para pelaut kuno memanfaatkan Angin Muson Barat Daya dan Muson Timur Laut untuk berlayar menyeberangi Samudra Hindia dan bersinggah di pelabuhan-pelabuhan Sumatera."
+            }
+        ];
+
+        function generateOfflineAiResponse(userQuery) {
+            const queryLower = userQuery.toLowerCase();
+            
+            // Search pattern in local knowledge base
+            for (let item of offlineKnowledgeBase) {
+                if (item.keywords.some(kw => queryLower.includes(kw))) {
+                    return item.response;
+                }
+            }
+
+            // General fallback response
+            return `Pertanyaan menarik tentang "${userQuery}"! Sebagai pemandu sejarah maritim Sumatera masa kuno, saya mencatat bahwa rempah-rempah Sumatera seperti Kapur Barus, Kemenyan, Lada Hitam, dan Kayu Manis telah diperdagangkan melalui Selat Malaka sejak abad ke-2 Masehi. Komoditas ini menghubungkan jaringan dagang internasional dari Tiongkok hingga Kekaisaran Romawi!`;
+        }
+
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('chatInput');
+            const query = inputEl.value.trim();
+            if(!query) return;
+
+            renderChatMessage('user', query);
+            inputEl.value = '';
+
+            // Simulate slight AI typing delay for natural feel
+            setTimeout(() => {
+                const aiResponse = generateOfflineAiResponse(query);
+                renderChatMessage('bimantara', aiResponse);
+            }, 400);
+        }
+
+        function sendQuickQuestion(qText) {
+            document.getElementById('chatInput').value = qText;
+            document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+        }
+
+        function renderChatMessage(sender, text) {
+            const chatBox = document.getElementById('chatMessages');
+            const msgRow = document.createElement('div');
+            msgRow.className = `msg-row ${sender}`;
+
+            if (sender === 'user') {
+                msgRow.innerHTML = `
+                    <div class="msg-bubble">${text}</div>
+                    <div class="msg-avatar" style="background-color:#44403c; color:#fff;">Kamu</div>
+                `;
+            } else {
+                msgRow.innerHTML = `
+                    <div class="msg-avatar">B</div>
+                    <div class="msg-bubble">
+                        <strong style="color: var(--amber-light); display:block; margin-bottom:0.25rem;">Bimantara:</strong>
+                        ${text}
+                    </div>
+                `;
+            }
+
+            chatBox.appendChild(msgRow);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
